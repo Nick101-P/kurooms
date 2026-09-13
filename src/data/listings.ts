@@ -63,7 +63,7 @@ const img = (id: string, w = 900) =>
 export const ROOMS: Room[] = [
   {
     id: "banepa-sunny-single",
-    title: "Sunny single room with study desk",
+    title: "Sunny single room with hill view",
     location: "Dhulikhel Bazaar",
     distanceKm: 0.8,
     rent: 6500,
@@ -71,7 +71,7 @@ export const ROOMS: Room[] = [
     furnished: true,
     verified: true,
     available: "Available now",
-    amenities: ["Wi-Fi", "Hot water", "Attached bathroom", "Study desk", "Water tank"],
+    amenities: ["Wi-Fi", "Hot water", "Attached bathroom", "Water tank"],
     includedFurniture: ["Bed", "Mattress", "Study table", "Chair", "Wardrobe"],
     description:
       "A bright top-floor room a short walk from Dhulikhel Bazaar. Big window facing the hills, quiet building with mostly KU students, and a landlord who lives on the ground floor.",
@@ -126,7 +126,7 @@ export const ROOMS: Room[] = [
     furnished: true,
     verified: true,
     available: "3 seats left",
-    amenities: ["Two meals", "Wi-Fi", "Laundry", "Study hall", "Warden"],
+    amenities: ["Two meals", "Wi-Fi", "Study hall", "Warden"],
     includedFurniture: ["Bed", "Mattress", "Study table", "Locker"],
     description:
       "Managed student hostel with dal bhat twice a day, night study hall and a warden on site. Monthly rate includes food.",
@@ -388,8 +388,6 @@ export const AMENITIES = [
   "Kitchen",
   "Balcony",
   "Parking",
-  "Laundry",
-  "Study desk",
 ];
 
 export const formatNpr = (n: number) => `Rs ${n.toLocaleString("en-IN")}`;

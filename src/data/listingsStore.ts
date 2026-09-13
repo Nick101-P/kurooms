@@ -9,7 +9,7 @@ type StoreData = {
   reports: ReportedListing[];
 };
 
-const STORAGE_KEY = "kurooms_listings_store_v1";
+const STORAGE_KEY = "kurooms_listings_store_v2";
 
 function loadInitialData(): StoreData {
   if (typeof window === "undefined") {

@@ -135,7 +135,7 @@ function RoomSearchPage() {
     <div className="container-page py-8">
       <h1 className="text-3xl">Rooms around Kathmandu University</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Sample listings in Dhulikhel, Banepa and along the Panauti road.
+        Available listings in Dhulikhel, Banepa and along the Panauti road.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -372,10 +372,6 @@ function RoomFilters({
           ))}
         </div>
       </div>
-
-      <Badge variant="secondary" className="w-full justify-center py-2">
-        Showing sample data
-      </Badge>
     </div>
   );
 }
