@@ -1,13 +1,6 @@
 export type RoomType = "Single" | "Shared" | "Flat" | "Hostel";
 export type FurnitureCategory =
-  | "Bed"
-  | "Mattress"
-  | "Table"
-  | "Chair"
-  | "Wardrobe"
-  | "Shelf"
-  | "Appliance"
-  | "Other";
+  "Bed" | "Mattress" | "Table" | "Chair" | "Wardrobe" | "Shelf" | "Appliance" | "Other";
 
 export interface Room {
   id: string;
@@ -38,6 +31,32 @@ export interface FurnitureItem {
   seller: { name: string; phone: string };
 }
 
+export type OtherItemCategory =
+  "Electronics" | "Books" | "Bicycle" | "Kitchen" | "Appliances" | "Music & Sports" | "Other";
+
+export interface OtherItem {
+  id: string;
+  title: string;
+  category: OtherItemCategory;
+  price: number;
+  condition: "New" | "Like new" | "Good" | "Used";
+  location: string;
+  description: string;
+  images: string[];
+  seller: { name: string; phone: string };
+}
+
+export interface ReportedListing {
+  id: string;
+  targetId: string;
+  targetType: "room" | "furniture" | "other";
+  targetTitle: string;
+  reporterName: string;
+  reason: string;
+  date: string;
+  status: "pending" | "resolved" | "dismissed";
+}
+
 const img = (id: string, w = 900) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=70`;
 
@@ -56,7 +75,11 @@ export const ROOMS: Room[] = [
     includedFurniture: ["Bed", "Mattress", "Study table", "Chair", "Wardrobe"],
     description:
       "A bright top-floor room a short walk from Dhulikhel Bazaar. Big window facing the hills, quiet building with mostly KU students, and a landlord who lives on the ground floor.",
-    images: [img("1505693416388-ac5ce068fe85"), img("1522708323590-d24dbb6b0267"), img("1560448204-e02f11c3d0e2")],
+    images: [
+      img("1505693416388-ac5ce068fe85"),
+      img("1522708323590-d24dbb6b0267"),
+      img("1560448204-e02f11c3d0e2"),
+    ],
     owner: { name: "Sabina Shrestha", phone: "+977 98•• ••4412", since: "2023" },
   },
   {
@@ -154,7 +177,8 @@ export const FURNITURE: FurnitureItem[] = [
     price: 4500,
     condition: "Good",
     location: "Dhulikhel Bazaar",
-    description: "Solid sal wood table used for two semesters. One deep drawer, no wobble. Pickup only.",
+    description:
+      "Solid sal wood table used for two semesters. One deep drawer, no wobble. Pickup only.",
     images: [img("1518455027359-f3f8164ba6bd")],
     seller: { name: "Aayush K.", phone: "+977 98•• ••2211" },
   },
@@ -176,7 +200,8 @@ export const FURNITURE: FurnitureItem[] = [
     price: 6800,
     condition: "Good",
     location: "Shreekhandapur",
-    description: "Lockable steel almirah with hanging rail and three shelves. Small dent on the side.",
+    description:
+      "Lockable steel almirah with hanging rail and three shelves. Small dent on the side.",
     images: [img("1595428774223-ef52624120d2")],
     seller: { name: "Sujan T.", phone: "+977 98•• ••4477" },
   },
@@ -198,7 +223,8 @@ export const FURNITURE: FurnitureItem[] = [
     price: 2600,
     condition: "Good",
     location: "Dhulikhel, Hospital road",
-    description: "Light plywood shelf, easy for one person to carry. Great for engineering textbooks.",
+    description:
+      "Light plywood shelf, easy for one person to carry. Great for engineering textbooks.",
     images: [img("1594620302200-9a762244a156")],
     seller: { name: "Bibek R.", phone: "+977 98•• ••7781" },
   },
@@ -237,6 +263,115 @@ export const FURNITURE: FurnitureItem[] = [
   },
 ];
 
+export const OTHER_CATEGORIES: OtherItemCategory[] = [
+  "Electronics",
+  "Books",
+  "Bicycle",
+  "Kitchen",
+  "Appliances",
+  "Music & Sports",
+  "Other",
+];
+
+export const OTHER_ITEMS: OtherItem[] = [
+  {
+    id: "scientific-calculator-casio",
+    title: "Casio fx-991EX ClassWiz Scientific Calculator",
+    category: "Electronics",
+    price: 1800,
+    condition: "Like new",
+    location: "Kavre, near KU gate",
+    description:
+      "Original Casio ClassWiz fx-991EX. Used for two semesters in engineering mathematics. All buttons and solar cell working flawlessly.",
+    images: [img("1587145820266-a5951ee6f620")],
+    seller: { name: "Prashant R.", phone: "+977 98•• ••9123" },
+  },
+  {
+    id: "mountain-bike-hero",
+    title: "Hero Sprint 21-Speed Mountain Bicycle",
+    category: "Bicycle",
+    price: 9500,
+    condition: "Good",
+    location: "Dhulikhel Bazaar",
+    description:
+      "21-speed gear cycle ideal for the uphill Dhulikhel - KU route. Front suspension, newly replaced brake pads and mudguards included.",
+    images: [img("1485965120184-e220f721d03e")],
+    seller: { name: "Rohan S.", phone: "+977 98•• ••4152" },
+  },
+  {
+    id: "ku-engineering-books-set",
+    title: "1st & 2nd Year KU Engineering Textbooks Bundle",
+    category: "Books",
+    price: 1500,
+    condition: "Good",
+    location: "Near KU gate",
+    description:
+      "Complete set of textbooks including Engineering Mathematics by Erwin Kreyszig, Physics, Chemistry, and Basic Electrical. Free handwritten notes included.",
+    images: [img("1497633762265-9d179a990aa6")],
+    seller: { name: "Dipesh K.", phone: "+977 98•• ••7841" },
+  },
+  {
+    id: "electric-kettle-prestige",
+    title: "Prestige 1.5L Stainless Steel Electric Kettle",
+    category: "Appliances",
+    price: 1100,
+    condition: "Good",
+    location: "Shreekhandapur",
+    description:
+      "Fast-boiling 1.5-litre kettle, auto cut-off protection. Lifesaver during winter study nights. Clean interior.",
+    images: [img("1544816155-12df9643f363")],
+    seller: { name: "Anjali G.", phone: "+977 98•• ••3625" },
+  },
+  {
+    id: "acoustic-guitar-yamaha",
+    title: "Yamaha F310 Acoustic Guitar with Padded Bag",
+    category: "Music & Sports",
+    price: 7200,
+    condition: "Like new",
+    location: "Dhulikhel, Hospital road",
+    description:
+      "Rich tone, low action setup, comes with D'Addario strings, tuner, and a waterproof padded gig bag. Selling because of semester load.",
+    images: [img("1510915361894-db8b60106cb1")],
+    seller: { name: "Suman T.", phone: "+977 98•• ••1489" },
+  },
+  {
+    id: "rice-cooker-baltra",
+    title: "Baltra 1.8L Automatic Rice Cooker",
+    category: "Kitchen",
+    price: 1600,
+    condition: "Good",
+    location: "Banepa",
+    description:
+      "Comes with non-stick inner bowl and steamer tray. Perfect for quick student meals in rooms.",
+    images: [img("1556911220-e15b29be8c8f")],
+    seller: { name: "Kritika M.", phone: "+977 98•• ••8532" },
+  },
+  {
+    id: "dell-24-inch-ips-monitor",
+    title: 'Dell 24" Full HD IPS Monitor (HDMI + VGA)',
+    category: "Electronics",
+    price: 11500,
+    condition: "Like new",
+    location: "Dhulikhel Bazaar",
+    description:
+      "75Hz IPS panel with vivid colors and eye-saver mode. Ideal for coding and dual-monitor setup. Original box and cables included.",
+    images: [img("1527443224154-c4a3942d3acf")],
+    seller: { name: "Bikram N.", phone: "+977 98•• ••6621" },
+  },
+  {
+    id: "badminton-set-yonex",
+    title: "Yonex Muscle Power Badminton Rackets (Pair)",
+    category: "Music & Sports",
+    price: 1900,
+    condition: "Good",
+    location: "Near KU gate",
+    description:
+      "Pair of lightweight aluminium-carbon rackets with grip tape and a tube of nylon shuttles. Great for evening matches at the KU court.",
+    images: [img("1626224583764-f87db24ac4ea")],
+    seller: { name: "Kiran B.", phone: "+977 98•• ••9904" },
+  },
+];
+
 export const LOCATIONS = [
   "Dhulikhel Bazaar",
   "Kavre, near KU gate",
@@ -258,3 +393,26 @@ export const AMENITIES = [
 ];
 
 export const formatNpr = (n: number) => `Rs ${n.toLocaleString("en-IN")}`;
+
+export const MOCK_REPORTS: ReportedListing[] = [
+  {
+    id: "rep-1",
+    targetId: "dhulikhel-1bhk-flat",
+    targetType: "room",
+    targetTitle: "Quiet 1BHK flat with kitchen",
+    reporterName: "KU Student (Batch 2022)",
+    reason: "Phone number was unreachable and rent quoted on call was different.",
+    date: "2026-09-12",
+    status: "pending",
+  },
+  {
+    id: "rep-2",
+    targetId: "study-table-oak",
+    targetType: "furniture",
+    targetTitle: "Wooden study table with drawer",
+    reporterName: "Aakash P.",
+    reason: "Item was already sold last week but still shown as active.",
+    date: "2026-09-10",
+    status: "pending",
+  },
+];

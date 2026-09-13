@@ -15,17 +15,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ROOMS, formatNpr } from "@/data/listings";
+import { listingsStore, useListingsStore } from "@/data/listingsStore";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/rooms/$roomId")({
   loader: ({ params }) => {
-    const room = ROOMS.find((r) => r.id === params.roomId);
+    const room =
+      listingsStore.getSnapshot().rooms.find((r) => r.id === params.roomId) ??
+      ROOMS.find((r) => r.id === params.roomId);
     if (!room) throw notFound();
     return { room };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Room unavailable — BasaiKU" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Room unavailable — BasaiKU" }, { name: "robots", content: "noindex" }],
+      };
     }
     const { room } = loaderData;
     const title = `${room.title} — ${formatNpr(room.rent)}/month in ${room.location}`;
@@ -45,7 +50,9 @@ export const Route = createFileRoute("/rooms/$roomId")({
 });
 
 function RoomDetailPage() {
-  const { room } = Route.useLoaderData();
+  const { room: initialRoom } = Route.useLoaderData();
+  const { rooms } = useListingsStore();
+  const room = rooms.find((r) => r.id === initialRoom.id) ?? initialRoom;
   const [active, setActive] = useState(0);
   const [saved, setSaved] = useState(false);
 
@@ -88,7 +95,9 @@ function RoomDetailPage() {
           <div className="mt-8">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{room.type}</Badge>
-              {room.furnished && <Badge className="bg-accent text-accent-foreground">Furnished</Badge>}
+              {room.furnished && (
+                <Badge className="bg-accent text-accent-foreground">Furnished</Badge>
+              )}
               {room.verified && (
                 <span className="flex items-center gap-1 text-xs font-medium text-success">
                   <BadgeCheck className="size-4" /> Verified listing
@@ -192,7 +201,12 @@ function RoomDetailPage() {
           <p className="font-display text-lg font-semibold">{formatNpr(room.rent)}</p>
           <p className="text-xs text-muted-foreground">per month</p>
         </div>
-        <Button variant="outline" size="icon" aria-label="Save listing" onClick={() => setSaved((s) => !s)}>
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="Save listing"
+          onClick={() => setSaved((s) => !s)}
+        >
           <Heart className={cn("size-4", saved && "fill-accent text-accent")} />
         </Button>
         <Button className="flex-1">

@@ -1,24 +1,42 @@
-# Pixel Perfect Capture
+# BasaiKU
 
-Implement exactly the screenshot and nothing else
+Student rooms, furnished stays, and second-hand furniture finder near Kathmandu University, Dhulikhel.
 
-This project was built with [Lovable](https://lovable.dev).
+## Features
 
-## Build with Lovable
+- **Room Listings**: Explore student rooms, apartments, and shared stays near KU.
+- **Furniture & Items Marketplace**: Buy and sell student essentials, study tables, chairs, mattresses, and appliances.
+- **Listing Flow**: Post rooms, furniture, and student services.
+- **Distance & Filters**: Filter by distance from KU main gate, price range, and amenities.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/f5ab1836-cb38-4727-993b-a7f5e4c6c485).
+## Tech Stack
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+- **Framework**: [TanStack Start](https://tanstack.com/start) with [TanStack Router](https://tanstack.com/router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com) v4
+- **UI Components**: Radix UI Primitives & Lucide Icons
+- **Server**: Nitro
 
-## Development
+## Getting Started
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+### Prerequisites
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+- Node.js (v20 or newer recommended)
+- npm
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+```bash
 npm run dev
+```
+
+### Build
+
+```bash
+npm run build
 ```

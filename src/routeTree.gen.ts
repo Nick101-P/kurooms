@@ -10,15 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ListRouteImport } from './routes/list'
 import { Route as FurnitureIndexRouteImport } from './routes/furniture.index'
 import { Route as FurnitureItemIdRouteImport } from './routes/furniture.$itemId'
+import { Route as OthersIndexRouteImport } from './routes/others.index'
+import { Route as OthersItemIdRouteImport } from './routes/others.$itemId'
 import { Route as RoomsIndexRouteImport } from './routes/rooms.index'
 import { Route as RoomsRoomIdRouteImport } from './routes/rooms.$roomId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListRoute = ListRouteImport.update({
@@ -36,6 +44,16 @@ const FurnitureItemIdRoute = FurnitureItemIdRouteImport.update({
   path: '/furniture/$itemId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OthersIndexRoute = OthersIndexRouteImport.update({
+  id: '/others/',
+  path: '/others/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OthersItemIdRoute = OthersItemIdRouteImport.update({
+  id: '/others/$itemId',
+  path: '/others/$itemId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsIndexRoute = RoomsIndexRouteImport.update({
   id: '/rooms/',
   path: '/rooms/',
@@ -49,62 +67,83 @@ const RoomsRoomIdRoute = RoomsRoomIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/list': typeof ListRoute
   '/furniture/$itemId': typeof FurnitureItemIdRoute
+  '/others/$itemId': typeof OthersItemIdRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/furniture/': typeof FurnitureIndexRoute
+  '/others/': typeof OthersIndexRoute
   '/rooms/': typeof RoomsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/list': typeof ListRoute
   '/furniture/$itemId': typeof FurnitureItemIdRoute
+  '/others/$itemId': typeof OthersItemIdRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/furniture': typeof FurnitureIndexRoute
+  '/others': typeof OthersIndexRoute
   '/rooms': typeof RoomsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/list': typeof ListRoute
   '/furniture/$itemId': typeof FurnitureItemIdRoute
+  '/others/$itemId': typeof OthersItemIdRoute
   '/rooms/$roomId': typeof RoomsRoomIdRoute
   '/furniture/': typeof FurnitureIndexRoute
+  '/others/': typeof OthersIndexRoute
   '/rooms/': typeof RoomsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/list'
     | '/furniture/$itemId'
+    | '/others/$itemId'
     | '/rooms/$roomId'
     | '/furniture/'
+    | '/others/'
     | '/rooms/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/list'
     | '/furniture/$itemId'
+    | '/others/$itemId'
     | '/rooms/$roomId'
     | '/furniture'
+    | '/others'
     | '/rooms'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/list'
     | '/furniture/$itemId'
+    | '/others/$itemId'
     | '/rooms/$roomId'
     | '/furniture/'
+    | '/others/'
     | '/rooms/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ListRoute: typeof ListRoute
   FurnitureItemIdRoute: typeof FurnitureItemIdRoute
+  OthersItemIdRoute: typeof OthersItemIdRoute
   RoomsRoomIdRoute: typeof RoomsRoomIdRoute
   FurnitureIndexRoute: typeof FurnitureIndexRoute
+  OthersIndexRoute: typeof OthersIndexRoute
   RoomsIndexRoute: typeof RoomsIndexRoute
 }
 
@@ -115,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/list': {
@@ -138,6 +184,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FurnitureItemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/others/': {
+      id: '/others/'
+      path: '/others'
+      fullPath: '/others/'
+      preLoaderRoute: typeof OthersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/others/$itemId': {
+      id: '/others/$itemId'
+      path: '/others/$itemId'
+      fullPath: '/others/$itemId'
+      preLoaderRoute: typeof OthersItemIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rooms/': {
       id: '/rooms/'
       path: '/rooms'
@@ -157,10 +217,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ListRoute: ListRoute,
   FurnitureItemIdRoute: FurnitureItemIdRoute,
+  OthersItemIdRoute: OthersItemIdRoute,
   RoomsRoomIdRoute: RoomsRoomIdRoute,
   FurnitureIndexRoute: FurnitureIndexRoute,
+  OthersIndexRoute: OthersIndexRoute,
   RoomsIndexRoute: RoomsIndexRoute,
 }
 export const routeTree = rootRouteImport

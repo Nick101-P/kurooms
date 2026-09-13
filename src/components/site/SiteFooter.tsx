@@ -22,6 +22,9 @@ export function SiteFooter() {
             <Link to="/furniture" className="block text-muted-foreground hover:text-foreground">
               Furniture
             </Link>
+            <Link to="/others" className="block text-muted-foreground hover:text-foreground">
+              Others
+            </Link>
           </div>
           <div className="space-y-2">
             <p className="font-medium">Areas</p>
@@ -31,8 +34,8 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="container-page border-t border-border py-6 text-xs text-muted-foreground">
-        Sample listings shown for demonstration. © {new Date().getFullYear()} BasaiKU.
+      <div className="container-page flex flex-col items-center justify-between gap-2 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row">
+        <span>Sample listings shown for demonstration. © {new Date().getFullYear()} BasaiKU.</span>
       </div>
     </footer>
   );

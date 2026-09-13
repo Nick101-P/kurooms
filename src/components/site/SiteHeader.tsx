@@ -8,6 +8,7 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/rooms", label: "Rooms" },
   { to: "/furniture", label: "Furniture" },
+  { to: "/others", label: "Others" },
 ] as const;
 
 export function SiteHeader() {

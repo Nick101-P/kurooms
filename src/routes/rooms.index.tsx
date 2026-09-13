@@ -17,7 +17,8 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { AMENITIES, LOCATIONS, ROOMS, formatNpr } from "@/data/listings";
+import { AMENITIES, LOCATIONS, formatNpr } from "@/data/listings";
+import { useListingsStore } from "@/data/listingsStore";
 
 type RoomSearch = {
   q?: string | undefined;
@@ -31,18 +32,36 @@ type RoomSearch = {
 };
 
 export const Route = createFileRoute("/rooms/")({
-  validateSearch: (search: Record<string, unknown>): RoomSearch => ({
-    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
-    location: typeof search["location"] === "string" ? search["location"] : undefined,
-    type: typeof search["type"] === "string" ? search["type"] : undefined,
-    maxRent: typeof search["maxRent"] === "number" ? search["maxRent"] : undefined,
-    maxDistance: typeof search["maxDistance"] === "number" ? search["maxDistance"] : undefined,
-    furnished: search["furnished"] === true || search["furnished"] === "true" ? true : undefined,
-    amenities: Array.isArray(search["amenities"]) ? (search["amenities"] as string[]) : undefined,
-    sort: (["rent-asc", "rent-desc", "distance"] as const).includes(search["sort"] as never)
-      ? (search["sort"] as RoomSearch["sort"])
-      : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): RoomSearch => {
+    const parseNumber = (val: unknown): number | undefined => {
+      if (typeof val === "number" && !isNaN(val)) return val;
+      if (typeof val === "string" && val.trim() !== "") {
+        const num = Number(val);
+        if (!isNaN(num)) return num;
+      }
+      return undefined;
+    };
+
+    return {
+      q: typeof search["q"] === "string" && search["q"].trim() ? search["q"].trim() : undefined,
+      location:
+        typeof search["location"] === "string" && search["location"]
+          ? search["location"]
+          : undefined,
+      type: typeof search["type"] === "string" && search["type"] ? search["type"] : undefined,
+      maxRent: parseNumber(search["maxRent"]),
+      maxDistance: parseNumber(search["maxDistance"]),
+      furnished: search["furnished"] === true || search["furnished"] === "true" ? true : undefined,
+      amenities: Array.isArray(search["amenities"])
+        ? (search["amenities"] as string[])
+        : typeof search["amenities"] === "string" && search["amenities"]
+          ? [search["amenities"]]
+          : undefined,
+      sort: (["rent-asc", "rent-desc", "distance"] as const).includes(search["sort"] as never)
+        ? (search["sort"] as RoomSearch["sort"])
+        : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Rooms near Kathmandu University — BasaiKU" },
@@ -67,13 +86,14 @@ const MAX_RENT = 15000;
 function RoomSearchPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/rooms/" });
+  const { rooms } = useListingsStore();
 
   const set = (patch: Partial<RoomSearch>) =>
     navigate({ search: (prev: RoomSearch) => ({ ...prev, ...patch }), replace: true });
 
   const results = useMemo(() => {
     const q = search.q?.toLowerCase().trim();
-    let list = ROOMS.filter((room) => {
+    let list = rooms.filter((room) => {
       if (q && !(room.title + room.location + room.description).toLowerCase().includes(q))
         return false;
       if (search.location && room.location !== search.location) return false;
@@ -89,7 +109,7 @@ function RoomSearchPage() {
     if (search.sort === "rent-desc") list = [...list].sort((a, b) => b.rent - a.rent);
     if (search.sort === "distance") list = [...list].sort((a, b) => a.distanceKm - b.distanceKm);
     return list;
-  }, [search]);
+  }, [search, rooms]);
 
   const activeChips = [
     search.location && { label: search.location, clear: { location: undefined } },
@@ -179,9 +199,7 @@ function RoomSearchPage() {
             </button>
           ))}
           <button
-            onClick={() =>
-              navigate({ search: {} as RoomSearch, replace: true })
-            }
+            onClick={() => navigate({ search: {} as RoomSearch, replace: true })}
             className="text-sm text-accent hover:underline"
           >
             Clear all

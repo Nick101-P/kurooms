@@ -4,15 +4,15 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { FURNITURE, formatNpr } from "@/data/listings";
+import { OTHER_ITEMS, formatNpr } from "@/data/listings";
 import { listingsStore, useListingsStore } from "@/data/listingsStore";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/furniture/$itemId")({
+export const Route = createFileRoute("/others/$itemId")({
   loader: ({ params }) => {
     const item =
-      listingsStore.getSnapshot().furniture.find((f) => f.id === params.itemId) ??
-      FURNITURE.find((f) => f.id === params.itemId);
+      listingsStore.getSnapshot().otherItems.find((f) => f.id === params.itemId) ??
+      OTHER_ITEMS.find((f) => f.id === params.itemId);
     if (!item) throw notFound();
     return { item };
   },
@@ -36,22 +36,22 @@ export const Route = createFileRoute("/furniture/$itemId")({
       ],
     };
   },
-  component: FurnitureDetailPage,
+  component: OtherItemDetailPage,
 });
 
-function FurnitureDetailPage() {
+function OtherItemDetailPage() {
   const { item: initialItem } = Route.useLoaderData();
-  const { furniture } = useListingsStore();
-  const item = furniture.find((f) => f.id === initialItem.id) ?? initialItem;
+  const { otherItems } = useListingsStore();
+  const item = otherItems.find((f) => f.id === initialItem.id) ?? initialItem;
   const [saved, setSaved] = useState(false);
 
   return (
     <div className="container-page py-6">
       <Link
-        to="/furniture"
+        to="/others"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="size-4" /> Back to furniture
+        <ArrowLeft className="size-4" /> Back to other items
       </Link>
 
       <div className="mt-4 grid gap-10 lg:grid-cols-[1fr_340px]">
@@ -70,7 +70,7 @@ function FurnitureDetailPage() {
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
             <span>Condition: {item.condition}</span>
             <span className="flex items-center gap-1">
-              <MapPin className="size-4" /> {item.location}
+              <MapPin className="size-3.5" /> {item.location}
             </span>
           </div>
 

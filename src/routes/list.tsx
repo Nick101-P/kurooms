@@ -12,7 +12,8 @@ export const Route = createFileRoute("/list")({
       { property: "og:title", content: "Create a listing — BasaiKU" },
       {
         property: "og:description",
-        content: "Offer rooms, furniture, useful items, and services to KU students around Dhulikhel.",
+        content:
+          "Offer rooms, furniture, useful items, and services to KU students around Dhulikhel.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

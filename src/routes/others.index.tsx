@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo } from "react";
-import { FurnitureCard } from "@/components/listings/FurnitureCard";
+import { OtherItemCard } from "@/components/listings/OtherItemCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,28 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { OTHER_CATEGORIES } from "@/data/listings";
 import { useListingsStore } from "@/data/listingsStore";
 
-type FurnitureSearch = {
+type OthersSearch = {
   q?: string | undefined;
   category?: string | undefined;
   sort?: "price-asc" | "price-desc" | undefined;
 };
 
-const FURNITURE_CATEGORIES = [
-  "Bed",
-  "Mattress",
-  "Table",
-  "Chair",
-  "Wardrobe",
-  "Shelf",
-  "Appliance",
-  "Other",
-];
-
-export const Route = createFileRoute("/furniture/")({
-  validateSearch: (search: Record<string, unknown>): FurnitureSearch => ({
-    q: typeof search["q"] === "string" && search["q"] ? search["q"] : undefined,
+export const Route = createFileRoute("/others/")({
+  validateSearch: (search: Record<string, unknown>): OthersSearch => ({
+    q: typeof search["q"] === "string" && search["q"].trim() ? search["q"].trim() : undefined,
     category: typeof search["category"] === "string" ? search["category"] : undefined,
     sort:
       search["sort"] === "price-asc" || search["sort"] === "price-desc"
@@ -41,32 +31,32 @@ export const Route = createFileRoute("/furniture/")({
   }),
   head: () => ({
     meta: [
-      { title: "Student furniture marketplace in Dhulikhel — BasaiKU" },
+      { title: "Other student items on sale in Dhulikhel — BasaiKU" },
       {
         name: "description",
         content:
-          "Buy second-hand beds, mattresses, desks, wardrobes and appliances from students around Kathmandu University.",
+          "Buy second-hand electronics, calculators, textbooks, bicycles, kitchenware, and sports gear from KU students.",
       },
-      { property: "og:title", content: "Student furniture marketplace in Dhulikhel" },
+      { property: "og:title", content: "Student items & essentials marketplace in Dhulikhel" },
       {
         property: "og:description",
-        content: "Cheap second-hand furniture from KU students who are moving out.",
+        content: "Second-hand gadgets, books, cycles, and daily essentials from KU students.",
       },
     ],
   }),
-  component: FurniturePage,
+  component: OthersPage,
 });
 
-function FurniturePage() {
+function OthersPage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/furniture/" });
-  const { furniture } = useListingsStore();
-  const set = (patch: Partial<FurnitureSearch>) =>
-    navigate({ search: (prev: FurnitureSearch) => ({ ...prev, ...patch }), replace: true });
+  const navigate = useNavigate({ from: "/others/" });
+  const { otherItems } = useListingsStore();
+  const set = (patch: Partial<OthersSearch>) =>
+    navigate({ search: (prev: OthersSearch) => ({ ...prev, ...patch }), replace: true });
 
   const results = useMemo(() => {
     const q = search.q?.toLowerCase().trim();
-    let list = furniture.filter((item) => {
+    let list = otherItems.filter((item) => {
       if (q && !(item.title + item.description + item.location).toLowerCase().includes(q))
         return false;
       if (search.category && item.category !== search.category) return false;
@@ -75,13 +65,13 @@ function FurniturePage() {
     if (search.sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     if (search.sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [search, furniture]);
+  }, [search, otherItems]);
 
   return (
     <div className="container-page py-8">
-      <h1 className="text-3xl">Student furniture marketplace</h1>
+      <h1 className="text-3xl">Other student items on sale</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Desks, mattresses and appliances passed on by students around Dhulikhel.
+        Electronics, textbooks, bicycles, appliances, and sports gear from students around KU.
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -90,9 +80,9 @@ function FurniturePage() {
           <Input
             value={search.q ?? ""}
             onChange={(e) => set({ q: e.target.value || undefined })}
-            placeholder="Search furniture"
+            placeholder="Search items, e.g. calculator, bicycle, kettle..."
             className="h-11 pl-9"
-            aria-label="Search furniture"
+            aria-label="Search items"
           />
         </div>
         <Select
@@ -101,7 +91,7 @@ function FurniturePage() {
             set({ sort: v === "recent" ? undefined : (v as "price-asc" | "price-desc") })
           }
         >
-          <SelectTrigger className="h-11 sm:w-52" aria-label="Sort furniture">
+          <SelectTrigger className="h-11 sm:w-52" aria-label="Sort items">
             <SelectValue>
               {
                 {
@@ -126,7 +116,7 @@ function FurniturePage() {
           active={!search.category}
           onClick={() => set({ category: undefined })}
         />
-        {FURNITURE_CATEGORIES.map((c) => (
+        {OTHER_CATEGORIES.map((c) => (
           <CategoryChip
             key={c}
             label={c}
@@ -149,7 +139,7 @@ function FurniturePage() {
           <Button
             variant="outline"
             className="mt-5"
-            onClick={() => navigate({ search: {} as FurnitureSearch, replace: true })}
+            onClick={() => navigate({ search: {} as OthersSearch, replace: true })}
           >
             Clear filters
           </Button>
@@ -157,7 +147,7 @@ function FurniturePage() {
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {results.map((item) => (
-            <FurnitureCard key={item.id} item={item} />
+            <OtherItemCard key={item.id} item={item} />
           ))}
         </div>
       )}

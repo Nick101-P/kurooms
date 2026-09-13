@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Tag } from "lucide-react";
-import type { FurnitureItem } from "@/data/listings";
+import type { OtherItem } from "@/data/listings";
 import { formatNpr } from "@/data/listings";
 import { Badge } from "@/components/ui/badge";
 
-export function FurnitureCard({ item }: { item: FurnitureItem }) {
+export function OtherItemCard({ item }: { item: OtherItem }) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lift">
       <div className="relative aspect-square overflow-hidden bg-muted">
@@ -27,7 +27,7 @@ export function FurnitureCard({ item }: { item: FurnitureItem }) {
         <div>
           <h3 className="font-display text-sm font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary">
             <Link
-              to="/furniture/$itemId"
+              to="/others/$itemId"
               params={{ itemId: item.id }}
               className="after:absolute after:inset-0"
             >
