@@ -9,6 +9,7 @@ import {
   Camera,
   Check,
   ChevronRight,
+  Clock,
   GripVertical,
   House,
   ImagePlus,
@@ -56,6 +57,8 @@ type ListingKind = "room" | "furniture" | "item" | "service";
 type Errors = {
   title?: string | undefined;
   price?: string | undefined;
+  ownerName?: string | undefined;
+  phone?: string | undefined;
   category?: string | undefined;
   location?: string | undefined;
   furnishing?: string | undefined;
@@ -70,6 +73,8 @@ type ListingData = {
   title: string;
   price: string;
   deposit: string;
+  ownerName: string;
+  phone: string;
   category: string;
   condition: string;
   location: string;
@@ -86,6 +91,8 @@ const initialData: ListingData = {
   title: "",
   price: "",
   deposit: "",
+  ownerName: "",
+  phone: "",
   category: "",
   condition: "",
   location: "",
@@ -184,10 +191,20 @@ const requiredText = z.string().trim().min(1, "This field is required");
 const positivePrice = z
   .string()
   .refine((value) => Number(value) > 0, "Enter a valid positive amount");
+const nameSchema = z
+  .string()
+  .trim()
+  .min(2, "Name must be at least 2 characters")
+  .regex(/^[^0-9]+$/, "Name cannot contain numbers")
+  .regex(/^[a-zA-Z\s.'-]+$/, "Name can only contain letters");
+const phoneSchema = z
+  .string()
+  .trim()
+  .regex(/^[0-9]{10}$/, "Enter a valid 10-digit phone number");
 const descriptionSchema = z
   .string()
   .trim()
-  .min(30, "Add at least 30 characters so students have enough detail");
+  .min(10, "Add at least 10 characters so students have enough detail");
 
 export function ListingFlow() {
   const [kind, setKind] = useState<ListingKind | null>(null);
@@ -237,6 +254,8 @@ export function ListingFlow() {
       if (step === 0) {
         validate("title", requiredText, data.title);
         validate("price", positivePrice, data.price);
+        validate("ownerName", nameSchema, data.ownerName);
+        validate("phone", phoneSchema, data.phone);
         validate("category", requiredText, data.category);
       }
       if (step === 1) validate("location", requiredText, data.location);
@@ -255,6 +274,8 @@ export function ListingFlow() {
       validate("category", requiredText, data.category);
       validate("title", requiredText, data.title);
       validate("price", positivePrice, data.price);
+      validate("ownerName", nameSchema, data.ownerName);
+      validate("phone", phoneSchema, data.phone);
       validate("location", requiredText, data.location);
       validate("description", descriptionSchema, data.description);
       if (kind !== "service") validate("condition", requiredText, data.condition);
@@ -272,21 +293,23 @@ export function ListingFlow() {
   };
 
   const back = () => {
-    if (step > 0) {
-      setStep((current) => current - 1);
-      setErrors({});
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (step === 0) {
+      if (isDirty) {
+        setLeaveOpen(true);
+        return;
+      }
+      leave();
       return;
     }
-    if (isDirty) setLeaveOpen(true);
-    else setKind(null);
+    setStep((current) => Math.max(0, current - 1));
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const leave = () => {
-    data.photos.forEach((photo) => URL.revokeObjectURL(photo.url));
-    setData(initialData);
     setKind(null);
+    setSelectedKind(null);
     setStep(0);
+    setData(initialData);
     setLeaveOpen(false);
     setErrors({});
   };
@@ -299,6 +322,9 @@ export function ListingFlow() {
         ? "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=70"
         : "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=70";
     const images = data.photos.length > 0 ? data.photos.map((p) => p.url) : [fallbackImage];
+    const phoneFormatted = data.phone ? `+977 ${data.phone}` : "+977 9800000000";
+    const ownerName = data.ownerName.trim() || "Room Owner";
+    const sellerName = data.ownerName.trim() || "Seller";
 
     if (kind === "room") {
       listingsStore.addRoom({
@@ -310,14 +336,15 @@ export function ListingFlow() {
         type: (data.category as "Single" | "Shared" | "Flat" | "Hostel") || "Single",
         furnished: data.furnishing.toLowerCase().includes("furnished"),
         verified: false,
+        status: "pending",
         available: data.availableFrom
           ? `Available from ${format(data.availableFrom, "MMMM d")}`
           : "Available now",
-        amenities: data.amenities.length > 0 ? data.amenities : ["Wi-Fi", "Water tank"],
+        amenities: data.amenities,
         includedFurniture: data.furniture,
         description: data.description || "Student-friendly room listed by owner.",
         images,
-        owner: { name: "You (KU Student)", phone: "+977 98•• ••0000", since: "2026" },
+        owner: { name: ownerName, phone: phoneFormatted, since: new Date().getFullYear().toString() },
       });
     } else if (kind === "furniture") {
       listingsStore.addFurniture({
@@ -329,7 +356,7 @@ export function ListingFlow() {
         location: data.location || "Dhulikhel Bazaar",
         description: data.description || "In good condition, moving out sale.",
         images,
-        seller: { name: "You (KU Student)", phone: "+977 98•• ••0000" },
+        seller: { name: sellerName, phone: phoneFormatted },
       });
     } else {
       listingsStore.addOtherItem({
@@ -341,7 +368,7 @@ export function ListingFlow() {
         location: data.location || "Dhulikhel Bazaar",
         description: data.description || "Student item on sale near KU.",
         images,
-        seller: { name: "You (KU Student)", phone: "+977 98•• ••0000" },
+        seller: { name: sellerName, phone: phoneFormatted },
       });
     }
 
@@ -368,6 +395,12 @@ export function ListingFlow() {
   if (!kind) return <TypeSelection selected={selectedKind} onSelect={chooseKind} />;
 
   const finalStep = step === steps.length - 1;
+  const submitLabel = finalStep
+    ? kind === "room"
+      ? "Submit for Admin Approval"
+      : "Publish listing"
+    : "Continue";
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-surface/60 pb-24 md:pb-12">
       <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:py-10">
@@ -392,7 +425,7 @@ export function ListingFlow() {
               </Button>
               <Button type="button" onClick={finalStep ? publish : nextStep} disabled={publishing}>
                 {publishing ? <Loader2 className="size-4 animate-spin" /> : null}
-                {finalStep ? "Publish listing" : "Continue"}
+                {submitLabel}
                 {!finalStep && <ArrowRight className="size-4" />}
               </Button>
             </div>
@@ -412,7 +445,7 @@ export function ListingFlow() {
             disabled={publishing}
           >
             {publishing && <Loader2 className="size-4 animate-spin" />}
-            {finalStep ? "Publish listing" : "Continue"}
+            {submitLabel}
             {!finalStep && <ArrowRight className="size-4" />}
           </Button>
         </div>
@@ -566,6 +599,21 @@ function RoomBasics({ data, errors, update }: StepProps) {
           value={data.deposit}
           onChange={(value) => update("deposit", value)}
           hint="Optional"
+        />
+        <Field label="Owner name" error={errors.ownerName}>
+          <Input
+            value={data.ownerName}
+            onChange={(e) => update("ownerName", e.target.value.replace(/[0-9]/g, ""))}
+            maxLength={50}
+            placeholder="e.g. Ram Shrestha"
+            className="h-11"
+          />
+        </Field>
+        <PhoneField
+          label="Phone number"
+          value={data.phone}
+          onChange={(val) => update("phone", val)}
+          error={errors.phone}
         />
         <Field label="Room type" error={errors.category} className="sm:col-span-2">
           <ChoiceCards
@@ -783,6 +831,21 @@ function ShortStep({
           onChange={(value) => update("price", value)}
           error={errors.price}
           required
+        />
+        <Field label={kind === "service" ? "Provider name" : "Seller name"} error={errors.ownerName}>
+          <Input
+            value={data.ownerName}
+            onChange={(e) => update("ownerName", e.target.value.replace(/[0-9]/g, ""))}
+            maxLength={50}
+            placeholder="e.g. Sabina Shrestha"
+            className="h-11"
+          />
+        </Field>
+        <PhoneField
+          label="Phone number"
+          value={data.phone}
+          onChange={(val) => update("phone", val)}
+          error={errors.phone}
         />
         {kind !== "service" && (
           <Field label="Condition" error={errors.condition}>
@@ -1093,14 +1156,22 @@ function ListingPreview({ kind, data }: { kind: ListingKind; data: ListingData }
                 "A clear, student-friendly listing with everything needed to make a confident decision."}
             </p>
           </div>
-          <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
-            <span className="flex size-10 items-center justify-center rounded-full bg-secondary text-primary">
-              <BadgeCheck className="size-5" />
-            </span>
-            <div>
-              <p className="text-xs text-muted-foreground">Listed by</p>
-              <p className="text-sm font-semibold">Verified owner</p>
+          <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
+            <div className="flex items-center gap-3">
+              <span className="flex size-10 items-center justify-center rounded-full bg-secondary text-primary">
+                <BadgeCheck className="size-5" />
+              </span>
+              <div>
+                <p className="text-xs text-muted-foreground">Listed by</p>
+                <p className="text-sm font-semibold">{data.ownerName.trim() || (kind === "room" ? "Room owner" : "Seller")}</p>
+              </div>
             </div>
+            {data.phone && (
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Contact</p>
+                <p className="font-mono text-sm font-semibold text-primary">+977 {data.phone}</p>
+              </div>
+            )}
           </div>
         </div>
       </article>
@@ -1186,16 +1257,34 @@ function PublishedState({
   title: string;
   onAnother: () => void;
 }) {
+  const isRoom = kind === "room";
   return (
     <div className="min-h-[70vh] bg-surface/60 px-4 py-16">
       <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center shadow-card sm:p-12">
-        <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-success/15 text-success">
-          <Check className="size-8" />
+        <span
+          className={cn(
+            "mx-auto flex size-16 items-center justify-center rounded-full",
+            isRoom ? "bg-amber-500/15 text-amber-500" : "bg-success/15 text-success",
+          )}
+        >
+          {isRoom ? <Clock className="size-8" /> : <Check className="size-8" />}
         </span>
-        <h1 className="mt-6 text-3xl">Your listing is ready</h1>
+        <h1 className="mt-6 text-3xl">
+          {isRoom ? "Submitted for Admin Approval" : "Your listing is ready"}
+        </h1>
         <p className="mt-3 text-muted-foreground">
-          <strong className="text-foreground">{title || OPTIONS[kind].title}</strong> has been
-          published for KU students to discover.
+          {isRoom ? (
+            <>
+              <strong className="text-foreground">{title || OPTIONS[kind].title}</strong> has been
+              submitted for verification. Our admin team will review and confirm the room details before
+              it appears on the public website.
+            </>
+          ) : (
+            <>
+              <strong className="text-foreground">{title || OPTIONS[kind].title}</strong> has been
+              published for KU students to discover.
+            </>
+          )}
         </p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Button variant="outline" onClick={onAnother}>
@@ -1204,7 +1293,7 @@ function PublishedState({
           <Button asChild>
             {kind === "room" ? (
               <Link to="/rooms">
-                View marketplace <ArrowRight className="size-4" />
+                Browse existing rooms <ArrowRight className="size-4" />
               </Link>
             ) : kind === "furniture" ? (
               <Link to="/furniture">
@@ -1277,14 +1366,61 @@ function MoneyField({
           NPR
         </span>
         <Input
-          type="number"
-          min="0"
-          step="100"
+          type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (["e", "E", "+", "-", "."].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            const digitsOnly = e.target.value.replace(/\D/g, "");
+            onChange(digitsOnly);
+          }}
           placeholder="0"
           className="h-11 pl-14"
+        />
+      </div>
+    </Field>
+  );
+}
+
+function PhoneField({
+  label = "Phone number",
+  value,
+  onChange,
+  error,
+}: {
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string | undefined;
+}) {
+  return (
+    <Field label={label} error={error} hint="10 digits">
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">
+          +977
+        </span>
+        <Input
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={10}
+          value={value}
+          onKeyDown={(e) => {
+            if (["e", "E", "+", "-", "."].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 10);
+            onChange(digitsOnly);
+          }}
+          placeholder="98XXXXXXXX"
+          className="h-11 pl-16"
         />
       </div>
     </Field>

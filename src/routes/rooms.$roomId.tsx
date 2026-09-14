@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
+  AlertCircle,
   ArrowLeft,
   BadgeCheck,
   CalendarCheck,
+  Clock,
   Flag,
   Heart,
   MapPin,
@@ -58,6 +60,25 @@ function RoomDetailPage() {
 
   return (
     <div className="container-page pb-28 pt-6 lg:pb-16">
+      {room.status === "pending" && (
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-700 dark:text-amber-400">
+          <Clock className="size-5 shrink-0" />
+          <div className="text-sm">
+            <strong className="font-semibold">Pending Admin Approval:</strong> This listing has
+            been submitted and is currently being reviewed by moderators. It is not yet visible to
+            the public.
+          </div>
+        </div>
+      )}
+      {room.status === "rejected" && (
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-destructive">
+          <AlertCircle className="size-5 shrink-0" />
+          <div className="text-sm">
+            <strong className="font-semibold">Listing Not Published:</strong> This room listing
+            was declined or unpublished by admin moderation.
+          </div>
+        </div>
+      )}
       <Link
         to="/rooms"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -143,19 +164,22 @@ function RoomDetailPage() {
               </p>
             )}
 
-            <Separator className="my-8" />
-
-            <h2 className="text-xl">Amenities</h2>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {room.amenities.map((a) => (
-                <li
-                  key={a}
-                  className="rounded-full border border-border bg-secondary px-3 py-1.5 text-sm text-secondary-foreground"
-                >
-                  {a}
-                </li>
-              ))}
-            </ul>
+            {room.amenities && room.amenities.length > 0 && (
+              <>
+                <Separator className="my-8" />
+                <h2 className="text-xl">Amenities</h2>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {room.amenities.map((a) => (
+                    <li
+                      key={a}
+                      className="rounded-full border border-border bg-secondary px-3 py-1.5 text-sm text-secondary-foreground"
+                    >
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
 
             <button className="mt-10 flex items-center gap-2 text-sm text-muted-foreground hover:text-destructive">
               <Flag className="size-4" /> Report this listing
@@ -171,8 +195,10 @@ function RoomDetailPage() {
             </p>
             <p className="mt-1 text-sm text-muted-foreground">{room.available}</p>
 
-            <Button className="mt-5 w-full" size="lg">
-              <Phone className="size-4" /> Contact owner
+            <Button className="mt-5 w-full" size="lg" asChild>
+              <a href={`tel:${room.owner.phone}`}>
+                <Phone className="size-4" /> Contact owner
+              </a>
             </Button>
             <Button
               variant="outline"
@@ -189,9 +215,6 @@ function RoomDetailPage() {
             <p className="text-sm font-semibold">{room.owner.name}</p>
             <p className="mt-1 text-sm text-muted-foreground">Listing since {room.owner.since}</p>
             <p className="mt-1 text-sm text-muted-foreground">{room.owner.phone}</p>
-            <p className="mt-4 text-xs text-muted-foreground">
-              Sample listing — contact details are hidden in this demo.
-            </p>
           </div>
         </aside>
       </div>
@@ -209,8 +232,10 @@ function RoomDetailPage() {
         >
           <Heart className={cn("size-4", saved && "fill-accent text-accent")} />
         </Button>
-        <Button className="flex-1">
-          <Phone className="size-4" /> Contact owner
+        <Button className="flex-1" asChild>
+          <a href={`tel:${room.owner.phone}`}>
+            <Phone className="size-4" /> Contact owner
+          </a>
         </Button>
       </div>
     </div>

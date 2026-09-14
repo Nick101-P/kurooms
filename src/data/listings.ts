@@ -1,4 +1,5 @@
 export type RoomType = "Single" | "Shared" | "Flat" | "Hostel";
+export type ListingStatus = "pending" | "approved" | "rejected";
 export type FurnitureCategory =
   "Bed" | "Mattress" | "Table" | "Chair" | "Wardrobe" | "Shelf" | "Appliance" | "Other";
 
@@ -11,6 +12,7 @@ export interface Room {
   type: RoomType;
   furnished: boolean;
   verified: boolean;
+  status?: ListingStatus;
   available: string;
   amenities: string[];
   includedFurniture: string[];
@@ -70,6 +72,7 @@ export const ROOMS: Room[] = [
     type: "Single",
     furnished: true,
     verified: true,
+    status: "approved",
     available: "Available now",
     amenities: ["Wi-Fi", "Hot water", "Attached bathroom", "Water tank"],
     includedFurniture: ["Bed", "Mattress", "Study table", "Chair", "Wardrobe"],
@@ -91,6 +94,7 @@ export const ROOMS: Room[] = [
     type: "Shared",
     furnished: true,
     verified: true,
+    status: "approved",
     available: "From Ashwin 1",
     amenities: ["Wi-Fi", "Shared kitchen", "Hot water", "Terrace"],
     includedFurniture: ["Bunk bed", "Mattress", "Study table", "Shelf"],
@@ -108,6 +112,7 @@ export const ROOMS: Room[] = [
     type: "Flat",
     furnished: false,
     verified: false,
+    status: "approved",
     available: "Available now",
     amenities: ["Kitchen", "Balcony", "Parking", "24hr water"],
     includedFurniture: [],
@@ -125,6 +130,7 @@ export const ROOMS: Room[] = [
     type: "Hostel",
     furnished: true,
     verified: true,
+    status: "approved",
     available: "3 seats left",
     amenities: ["Two meals", "Wi-Fi", "Study hall", "Warden"],
     includedFurniture: ["Bed", "Mattress", "Study table", "Locker"],
@@ -142,6 +148,7 @@ export const ROOMS: Room[] = [
     type: "Single",
     furnished: true,
     verified: false,
+    status: "approved",
     available: "From next month",
     amenities: ["Wi-Fi", "Balcony", "Hot water", "Solar backup"],
     includedFurniture: ["Bed", "Mattress", "Wardrobe", "Study table"],
@@ -159,6 +166,7 @@ export const ROOMS: Room[] = [
     type: "Shared",
     furnished: false,
     verified: false,
+    status: "approved",
     available: "Available now",
     amenities: ["Shared kitchen", "Water tank"],
     includedFurniture: [],

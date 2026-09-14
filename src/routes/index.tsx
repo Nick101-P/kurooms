@@ -40,8 +40,9 @@ function HomePage() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const { rooms, furniture, otherItems } = useListingsStore();
-  const featured = rooms.slice(0, 3);
-  const furnished = rooms.filter((r) => r.furnished).slice(0, 3);
+  const approvedRooms = rooms.filter((r) => !r.status || r.status === "approved");
+  const featured = approvedRooms.slice(0, 3);
+  const furnished = approvedRooms.filter((r) => r.furnished).slice(0, 3);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

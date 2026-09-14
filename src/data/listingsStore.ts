@@ -33,7 +33,10 @@ function loadInitialData(): StoreData {
     }
     const parsed = JSON.parse(raw) as Partial<StoreData>;
     return {
-      rooms: Array.isArray(parsed.rooms) && parsed.rooms.length > 0 ? parsed.rooms : ROOMS,
+      rooms:
+        Array.isArray(parsed.rooms) && parsed.rooms.length > 0
+          ? parsed.rooms.map((r) => ({ ...r, status: r.status || "approved" }))
+          : ROOMS,
       furniture:
         Array.isArray(parsed.furniture) && parsed.furniture.length > 0
           ? parsed.furniture
@@ -84,6 +87,30 @@ export const listingsStore = {
     storeState = {
       ...storeState,
       rooms: [room, ...storeState.rooms],
+    };
+    persistAndNotify();
+  },
+
+  approveRoom(id: string) {
+    storeState = {
+      ...storeState,
+      rooms: storeState.rooms.map((r) => (r.id === id ? { ...r, status: "approved" } : r)),
+    };
+    persistAndNotify();
+  },
+
+  rejectRoom(id: string) {
+    storeState = {
+      ...storeState,
+      rooms: storeState.rooms.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)),
+    };
+    persistAndNotify();
+  },
+
+  setRoomStatus(id: string, status: "pending" | "approved" | "rejected") {
+    storeState = {
+      ...storeState,
+      rooms: storeState.rooms.map((r) => (r.id === id ? { ...r, status } : r)),
     };
     persistAndNotify();
   },

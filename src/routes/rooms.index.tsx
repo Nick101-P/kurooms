@@ -94,6 +94,7 @@ function RoomSearchPage() {
   const results = useMemo(() => {
     const q = search.q?.toLowerCase().trim();
     let list = rooms.filter((room) => {
+      if (room.status && room.status !== "approved") return false;
       if (q && !(room.title + room.location + room.description).toLowerCase().includes(q))
         return false;
       if (search.location && room.location !== search.location) return false;

@@ -35,7 +35,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="container-page flex flex-col items-center justify-between gap-2 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row">
-        <span>Sample listings shown for demonstration. © {new Date().getFullYear()} BasaiKU.</span>
+        <span>© {new Date().getFullYear()} BasaiKU. All rights reserved.</span>
       </div>
     </footer>
   );

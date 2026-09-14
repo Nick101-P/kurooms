@@ -76,8 +76,10 @@ function FurnitureDetailPage() {
 
           <p className="mt-5 text-base leading-relaxed text-foreground/90">{item.description}</p>
 
-          <Button className="mt-6 w-full" size="lg">
-            <Phone className="size-4" /> Contact seller
+          <Button className="mt-6 w-full" size="lg" asChild>
+            <a href={`tel:${item.seller.phone}`}>
+              <Phone className="size-4" /> Contact seller
+            </a>
           </Button>
           <Button
             variant="outline"
@@ -93,9 +95,6 @@ function FurnitureDetailPage() {
 
           <p className="text-sm font-semibold">{item.seller.name}</p>
           <p className="mt-1 text-sm text-muted-foreground">{item.seller.phone}</p>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Sample listing — contact details are hidden in this demo.
-          </p>
         </div>
       </div>
     </div>
